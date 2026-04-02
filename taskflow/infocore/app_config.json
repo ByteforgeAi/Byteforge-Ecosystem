@@ -1,0 +1,56 @@
+export interface LoggingConfig {
+  level: "debug" | "info" | "warn" | "error"
+  destinations: Array<"console" | "file" | "remote">
+  filePath?: string
+  remoteUrl?: string
+}
+
+export interface FeatureFlags {
+  enableDiagnostics: boolean
+  enableRealTimeAlerts: boolean
+  enableTracing?: boolean
+  enableExperimental?: boolean
+}
+
+export interface ProjectConfig {
+  projectName: string
+  environment: "development" | "staging" | "production"
+  logging: LoggingConfig
+  features: FeatureFlags
+}
+
+export const defaultConfig: ProjectConfig = {
+  projectName: "project",
+  environment: "development",
+  logging: {
+    level: "info",
+    destinations: ["console"],
+  },
+  features: {
+    enableDiagnostics: false,
+    enableRealTimeAlerts: false,
+  },
+}
+
+/**
+ * Load config from partial overrides
+ */
+export function loadConfig(overrides: Partial<ProjectConfig>): ProjectConfig {
+  return {
+    ...defaultConfig,
+    ...overrides,
+    logging: { ...defaultConfig.logging, ...overrides.logging },
+    features: { ...defaultConfig.features, ...overrides.features },
+  }
+}
+
+/**
+ * Pretty print a config
+ */
+export function describeConfig(cfg: ProjectConfig): string {
+  return `[${cfg.environment.toUpperCase()}] ${cfg.projectName}
+Logging → level=${cfg.logging.level}, outputs=${cfg.logging.destinations.join(", ")}
+Features → ${Object.entries(cfg.features)
+    .map(([k, v]) => `${k}=${v}`)
+    .join(", ")}`
+}

@@ -1,0 +1,48 @@
+export interface ExperimentParameters {
+  tokenSymbol: string
+  analysisWindowMinutes: number
+  volatilityThreshold: number
+}
+
+export interface ExperimentResult {
+  averageVolatility: number
+  exceededThreshold: boolean
+  observations: number
+  details?: Record<string, any>
+}
+
+export type ExperimentStatus = "draft" | "running" | "completed" | "failed"
+
+export interface Experiment {
+  experimentId: string
+  createdAt: string
+  description: string
+  parameters: ExperimentParameters
+  status: ExperimentStatus
+  results: ExperimentResult | null
+  notes: string
+}
+
+export function createDraftExperiment(): Experiment {
+  return {
+    experimentId: "",
+    createdAt: new Date().toISOString(),
+    description: "",
+    parameters: {
+      tokenSymbol: "",
+      analysisWindowMinutes: 0,
+      volatilityThreshold: 0.0,
+    },
+    status: "draft",
+    results: null,
+    notes: "",
+  }
+}
+
+export function summarizeExperiment(exp: Experiment): string {
+  return `Experiment ${exp.experimentId || "(unassigned)"} — ${exp.status.toUpperCase()}
+Token: ${exp.parameters.tokenSymbol}
+Window: ${exp.parameters.analysisWindowMinutes}m
+Threshold: ${exp.parameters.volatilityThreshold}
+Notes: ${exp.notes || "none"}`
+}
